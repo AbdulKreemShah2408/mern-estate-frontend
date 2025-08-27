@@ -54,7 +54,7 @@ export default function Search() {
       apiParams.set("limit", 9);
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/listing/get?${apiParams.toString()}`);
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/listing/get?${apiParams.toString()}`);
         const data = await res.json();
 
         if (data.length === 9) {
@@ -113,7 +113,7 @@ export default function Search() {
     urlParams.set("limit", 9);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/listing/get?${urlParams.toString()}`);
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/listing/get?${urlParams.toString()}`);
       const data = await res.json();
 
       if (data.length < 9) {

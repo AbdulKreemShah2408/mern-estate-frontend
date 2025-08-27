@@ -21,7 +21,7 @@ export default function SignIn() {
     e.preventDefault();
     try {
       dispatch(signInStart());
-    const res=await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/auth/signin`,{
+    const res=await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/signin`,{
       method:'POST',
       headers:{
         'Content-type':'application/json'
