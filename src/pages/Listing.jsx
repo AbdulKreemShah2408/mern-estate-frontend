@@ -27,9 +27,7 @@ export default function Listing() {
     const fetchListing = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/listing/get/${params.listingId}`
-        );
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/listing/get/${params.listingId}`);
         const data = await res.json();
 
         if (data.success === false) {
@@ -103,55 +101,54 @@ export default function Listing() {
               {listing.address}
             </p>
             <div className="flex gap-4">
-              <p className="bg-red-900 w-full max-w-[200px] text white text-center p-1 rounded-md ">
-                {listing.type === "rent" ? "For Rent" : "For Sale"}
-              </p>
-              {listing.offer && (
-                <p className="bg-green-900 w-full max-w-[200px] text white text-center p-1 rounded-md ">
-                  ${+listing.regularPrice - +listing.discountPrice} OFF
+                <p className="bg-red-900 w-full max-w-[200px] text white text-center p-1 rounded-md ">
+                    {listing.type==='rent' ? 'For Rent' :'For Sale'}
                 </p>
-              )}
+                {
+                    listing.offer && (
+                        <p className="bg-green-900 w-full max-w-[200px] text white text-center p-1 rounded-md ">${+listing.regularPrice-+listing.discountPrice} OFF</p>
+                    )
+                }
             </div>
-            <p className="text-slate-800">
-              <span className="font-semibold text-black">Description -{" "}</span>
-              {listing.description}
-            </p>
+             <p className="text-slate-800"><span className="font-semibold text-black">Description -{' '}</span>{listing.description}</p>
             <ul className="flex gap-6 items-center whitespace-nowrap text-green-900">
-              <li className="flex items-center gap-1">
-                <FaBed className="text-lg text-green-900" />
-                {listing.bedrooms > 1
-                  ? `${listing.bedrooms} beds `
-                  : `${listing.bedrooms} bed `}
-              </li>
-              <li className="flex items-center gap-1 whitespace-nowrap">
-                <FaBath className="text-lg text-green-900" />
-                {listing.bathrooms > 1
-                  ? `${listing.bathrooms} baths `
-                  : `${listing.bathrooms} bath `}
-              </li>
-              <li className="flex items-center gap-1 whitespace-nowrap">
-                <FaParking className="text-lg text-green-900" />
-                {listing.parking ? "Parking spot" : "No Parking"}
-              </li>
-              <li className="flex items-center gap-1 whitespace-nowrap">
-                <FaChair className="text-lg text-green-900" />
-                {listing.furnished ? "Furnished" : "Unfurnished"}
-              </li>
-            </ul>
-            {currentUser &&
-              String(listing.userRef) !==
-                String(currentUser._id || currentUser.id) &&
-              !contact && (
-                <button
-                  onClick={() => setContact(true)}
-                  className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3"
-                >
-                  Contact landlord
-                </button>
-              )}
-
+            <li className="flex items-center gap-1">
+           <FaBed className="text-lg text-green-900" />
+              {listing.bedrooms > 1
+               ? `${listing.bedrooms} beds `
+              : `${listing.bedrooms} bed `}
+           </li>
+          <li className="flex items-center gap-1 whitespace-nowrap">
+             <FaBath className="text-lg text-green-900" />
+             {listing.bathrooms > 1
+           ? `${listing.bathrooms} baths `
+            : `${listing.bathrooms} bath `}
+        </li>
+            <li className="flex items-center gap-1 whitespace-nowrap">
+          <FaParking className="text-lg text-green-900" />
+           {listing.parking ? "Parking spot" : "No Parking"}
+          </li>
+         <li className="flex items-center gap-1 whitespace-nowrap">
+         <FaChair className="text-lg text-green-900" />
+          {listing.furnished ? "Furnished" : "Unfurnished"}
+            </li>
+          </ul>
+            {currentUser && String(listing.userRef) !== String(currentUser._id || currentUser.id) && !contact && ( 
+              <button
+                onClick={() => setContact(true)}
+                className="bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3"
+              >
+                Contact landlord
+              </button>
+              
+           )}
+           
             {contact && <Contact listing={listing} />}
+          
           </div>
+        
+
+         
         </>
       )}
     </main>

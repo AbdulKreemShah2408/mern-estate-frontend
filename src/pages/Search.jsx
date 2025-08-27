@@ -59,7 +59,7 @@ export default function Search() {
 
         if (data.length === 9) {
           setShowMore(true);
-          setListings(data.slice(0, 8));
+          setListings(data.slice(0, 8)); 
         } else {
           setShowMore(false);
           setListings(data);
@@ -75,7 +75,6 @@ export default function Search() {
 
     fetchListings();
   }, [location.search]);
-
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
 
@@ -129,14 +128,117 @@ export default function Search() {
 
   return (
     <div className="flex flex-col md:flex-row">
-      {/* Sidebar */}
       <div className="p-7 border-b-2 md:border-r-2 md:min-h-screen w-full md:w-72">
-        {/* form code same */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+          <div className="flex flex-col">
+            <label htmlFor="searchTerm" className="whitespace-nowrap font-semibold mb-1">
+              Search Term:
+            </label>
+            <input
+              type="text"
+              id="searchTerm"
+              placeholder="Search..."
+              className="border rounded-lg p-3 w-full"
+              value={sidebarData.searchTerm}
+              onChange={handleChange}
+            />
+          </div>
+          <fieldset className="flex flex-col gap-2">
+            <legend className="font-semibold">Type:</legend>
+            {["all", "rent", "sale"].map((option) => (
+              <label key={option} className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  id="type"
+                  name="type"
+                  value={option}
+                  checked={sidebarData.type === option}
+                  onChange={handleChange}
+                />
+                <span className="capitalize">{option === "all" ? "Rent & Sale" : option}</span>
+              </label>
+            ))}
+          </fieldset>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="offer"
+              checked={sidebarData.offer}
+              onChange={handleChange}
+              className="w-5"
+            />
+            <label htmlFor="offer" className="font-semibold cursor-pointer">
+              Offer
+            </label>
+          </div>
+          <fieldset className="flex flex-col gap-2">
+            <legend className="font-semibold">Amenities:</legend>
+            {["parking", "furnished"].map((amenity) => (
+              <label key={amenity} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id={amenity}
+                  checked={sidebarData[amenity]}
+                  onChange={handleChange}
+                  className="w-5"
+                />
+                <span className="capitalize">{amenity}</span>
+              </label>
+            ))}
+          </fieldset>
+          <div className="flex flex-col">
+            <label htmlFor="sort_order" className="font-semibold mb-1">
+              Sort:
+            </label>
+            <select
+              id="sort_order"
+              value={`${sidebarData.sort}_${sidebarData.order}`}
+              onChange={handleChange}
+              className="border rounded-lg p-3"
+            >
+              <option value="regularPrice_desc">Price high to low</option>
+              <option value="regularPrice_asc">Price low to high</option>
+              <option value="createdAt_desc">Latest</option>
+              <option value="createdAt_asc">Oldest</option>
+            </select>
+          </div>
+          <button
+            type="submit"
+            className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95"
+          >
+            Search
+          </button>
+        </form>
       </div>
-
-      {/* Listings */}
       <div className="flex-1">
-        {/* same UI as your version */}
+        <h1 className="text-3xl font-semibold border-b p-3 text-slate-700 mt-5 md:mt-0">
+          Listing results
+        </h1>
+        <div className="p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loading && (
+            <p className="text-xl text-slate-700 text-center w-full">Loading...</p>
+          )}
+
+          {!loading && listings.length === 0 && (
+            <p className="text-xl text-slate-700">No Listing found!</p>
+          )}
+
+          {!loading &&
+            listings.map((listing) => (
+              <ListingItem key={listing._id} listing={listing} />
+            ))}
+        </div>
+
+        {showMore && (
+          <div className="flex justify-center w-full">
+            <button
+              onClick={onShowMoreClick}
+              className="text-green-700 hover:underline p-7"
+            >
+              Show more
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

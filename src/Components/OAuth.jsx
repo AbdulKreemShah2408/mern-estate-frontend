@@ -1,35 +1,35 @@
-import React from "react";
+import React from 'react'
+import {getAuth, GoogleAuthProvider, signInWithPopup} from 'firebase/auth'
+import { app } from "../firebase";  
+import {useDispatch} from "react-redux" 
+import {signInSuccess} from '../redux/user/userSlice';
+import {useNavigate} from "react-router-dom"
 
 export default function OAuth() {
-  const API_URL = import.meta.env.VITE_BACKEND_API_URL;
-
-  const handleGoogleSignIn = async () => {
+  const dispatch=useDispatch();
+  const navigate=useNavigate();
+  const handleGoogleClick=async()=>{
     try {
-      const res = await fetch(`${API_URL}/auth/google`, {
-        method: "POST",
-        credentials: "include",
-      });
+      const provider=new GoogleAuthProvider();
+      const auth=getAuth(app);
+      const result=await signInWithPopup(auth,provider);
+     const res=await fetch("${import.meta.env.VITE_BACKEND_API_URL}/auth/google",{
+      method:"POST",
+      headers:{
+        'Content-Type':'application/json',
+      },
+      body:JSON.stringify({name:result.user.displayName,email:result.user.email,photo:result.user.photoURL})
 
-      const data = await res.json();
-      console.log("Google Sign In Response:", data);
-
-      if (data.success === false) {
-        alert(data.message);
-        return;
-      }
-
-      // yahan dispatch/signInSuccess ya redirect kar sakte ho
-    } catch (err) {
-      console.error("Could not sign in with Google", err);
+     });
+     const data=await res.json();
+     dispatch(signInSuccess(data));
+     navigate("/");
+    } catch (error) {
+      console.log("could not sign with google",error);
     }
-  };
-
+  }
   return (
-    <button
-      onClick={handleGoogleSignIn}
-      className="bg-red-600 text-white p-3 rounded-lg mt-2"
-    >
-      Sign in with Google
-    </button>
-  );
+      <button onClick={handleGoogleClick} type='button' className='bg-red-700 text-white p-3 rounded-lg uppercase hover:opacity-95'>Continue with google</button>
+  
+  )
 }
