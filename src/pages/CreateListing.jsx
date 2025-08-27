@@ -107,6 +107,7 @@ export default function CreateListing() {
         method:"POST",
         headers:{
           "Content-Type":"application/json",
+           "Authorization": `Bearer ${currentUser.token}`,
         },
          credentials: "include",
         body:JSON.stringify({
@@ -120,7 +121,10 @@ export default function CreateListing() {
       if(data.success===false){
         setError(data.message);
       }
-      navigate(`/listing/${data._id}`);
+      if (data && data._id) {
+  navigate(`/listing/${data._id}`);
+}
+
     } catch (error) {
       setError(error.message);
       setLoading(false);
