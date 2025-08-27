@@ -25,7 +25,7 @@ export default function Home() {
     };
     const fetchRentListings = async () => {
       try {
-        const res = await fetch('${import.meta.env.VITE_BACKEND_API_URL}/listing/get?type=rent&limit=4');
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/listing/get?type=rent&limit=4`);
         const data = await res.json();
         setRentListings(data);
         fetchSaleListings();
@@ -35,7 +35,7 @@ export default function Home() {
     };
     const fetchSaleListings = async () => {
       try {
-        const res = await fetch('${import.meta.env.VITE_BACKEND_API_URL}/listing/get?type=sale&limit=4');
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/listing/get?type=sale&limit=4`);
         const data = await res.json();
         setSaleListings(data);
       } catch (error) {
