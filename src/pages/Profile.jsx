@@ -9,7 +9,7 @@ import {
   deleteUserSuccess,
   deleteUserFailure,
   signOutUserStart,
-  signOutInFailure,
+  signOutFailure,
   signOutUserSuccess,
   
 } from "../redux/user/userSlice";
@@ -133,13 +133,13 @@ export default function Profile() {
     const res=await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/signout`);
     const data=await res.json();
     if(data.success===false){
-      dispatch(signOutInFailure());
+      dispatch(signOutFailure());
      return;
     }
     dispatch(signOutUserSuccess(data));
 
   } catch (error) {
-    dispatch(signOutInFailure());
+    dispatch(signOutFailure());
   }
   }
 
