@@ -169,6 +169,7 @@ export default function Profile() {
    try {
     const res=await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/listing/delete/${listingId}`,{
       method:"DELETE",
+        credentials: "include",
     });
     const data=await res.json();
     if(data.success===false){
