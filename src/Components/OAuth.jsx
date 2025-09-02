@@ -12,11 +12,14 @@ export default function OAuth() {
     try {
       const provider=new GoogleAuthProvider();
       const auth=getAuth(app);
+      const token = await result.user.getIdToken();
+
       const result=await signInWithPopup(auth,provider);
      const res=await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/google`,{
       method:"POST",
       headers:{
         'Content-Type':'application/json',
+         'Authorization': `Bearer ${token}`
       },
       body:JSON.stringify({name:result.user.displayName,email:result.user.email,photo:result.user.photoURL})
 
