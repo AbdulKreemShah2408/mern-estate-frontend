@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function UpdateListing() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser,token } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const params = useParams();
   const listingId = params.listingId;
