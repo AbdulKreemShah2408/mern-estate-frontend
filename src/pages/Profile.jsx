@@ -16,7 +16,7 @@ import { Link } from "react-router-dom";
 
 export default function Profile() {
   const fileRef = useRef(null);
-  const { currentUser, loading, error } = useSelector((state) => state.user);
+  const { currentUser, token, loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const [updateSucces, setUpdateSuccess] = useState(false);
@@ -55,7 +55,7 @@ export default function Profile() {
         const data = JSON.parse(xhr.responseText);
         if (data.secure_url) {
           const updatedUser = { ...currentUser, avatar: data.secure_url };
-          dispatch(signInSuccess(updatedUser));
+          dispatch(signInSuccess({ user: updatedUser, token }));
           setFormData((prev) => ({ ...prev, avatar: data.secure_url }));
           setFilePerc(100);
           setFileUploadError(false);
@@ -82,7 +82,6 @@ export default function Profile() {
     if (!currentUser?._id) return;
     dispatch(updateUserStart());
     try {
-      const token = JSON.parse(localStorage.getItem("user"))?.token;
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/user/update/${currentUser._id}`,
         {
@@ -109,7 +108,6 @@ export default function Profile() {
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
-      const token = JSON.parse(localStorage.getItem("user"))?.token;
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/user/delete/${currentUser._id}`,
         {
@@ -142,7 +140,6 @@ export default function Profile() {
   const handleShowListings = async () => {
     try {
       setShowListingsError(false);
-      const token = JSON.parse(localStorage.getItem("user"))?.token;
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/user/listings/${currentUser._id}`,
         {
@@ -162,7 +159,6 @@ export default function Profile() {
 
   const handleListingDelete = async (listingId) => {
     try {
-      const token = JSON.parse(localStorage.getItem("user"))?.token;
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/listing/delete/${listingId}`,
         {
