@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import {useSelector} from "react-redux"
 import {useNavigate} from 'react-router-dom'
 export default function CreateListing() {
-  const {currentUser,token} =useSelector(state=>state.user);
+  const {currentUser} =useSelector(state=>state.user);
+  const token = currentUser?.token;
+const user = currentUser?.user;
+
+console.log("Token:", token);
+console.log("User:", user);
   const navigate=useNavigate();
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
