@@ -16,10 +16,10 @@ import { Link } from "react-router-dom";
 
 export default function Profile() {
   const fileRef = useRef(null);
-  const { currentUser, token, loading, error } = useSelector((state) => state.user);
+  const { currentUser, token, loading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  const [updateSucces, setUpdateSuccess] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
   const [userListings, setUserListings] = useState([]);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
@@ -79,7 +79,7 @@ export default function Profile() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    if (!currentUser?._id) return;
+    if (!currentUser?._id || !token) return;
     dispatch(updateUserStart());
     try {
       const res = await fetch(
@@ -106,8 +106,9 @@ export default function Profile() {
   };
 
   const handleDeleteUser = async () => {
+    if (!currentUser?._id || !token) return;
+    dispatch(deleteUserStart());
     try {
-      dispatch(deleteUserStart());
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/user/delete/${currentUser._id}`,
         {
@@ -127,8 +128,9 @@ export default function Profile() {
   };
 
   const handleSignOut = async () => {
+    if (!token) return;
+    dispatch(signOutUserStart());
     try {
-      dispatch(signOutUserStart());
       await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/signout`);
       dispatch(signOutUserSuccess());
       localStorage.removeItem("user");
@@ -138,8 +140,9 @@ export default function Profile() {
   };
 
   const handleShowListings = async () => {
+    if (!currentUser?._id || !token) return;
+    setShowListingsError(false);
     try {
-      setShowListingsError(false);
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/user/listings/${currentUser._id}`,
         {
@@ -158,6 +161,7 @@ export default function Profile() {
   };
 
   const handleListingDelete = async (listingId) => {
+    if (!listingId || !token) return;
     try {
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/api/listing/delete/${listingId}`,
@@ -241,7 +245,7 @@ export default function Profile() {
         </button>
       </div>
       <p className="text-green-700 mt-5">
-        {updateSucces ? "User is updated successfully" : ""}
+        {updateSuccess ? "User is updated successfully" : ""}
       </p>
       <button onClick={handleShowListings} className="text-green-700 w-full">
         Show Listings

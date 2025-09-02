@@ -14,10 +14,8 @@ export default function OAuth() {
       const provider = new GoogleAuthProvider();
       const auth = getAuth(app);
 
-      // Firebase Google Sign In
       const result = await signInWithPopup(auth, provider);
 
-      // Send user data to backend
       const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/google`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
@@ -30,7 +28,6 @@ export default function OAuth() {
 
       const data = await res.json();
 
-      // Assuming backend returns { user, token }
       if (res.ok) {
         dispatch(signInSuccess({ user: data.user, token: data.token }));
         navigate("/");

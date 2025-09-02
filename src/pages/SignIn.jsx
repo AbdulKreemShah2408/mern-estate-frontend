@@ -1,54 +1,35 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  signInStart,
-  signInSuccess,
-  signInFailure,
-} from "../redux/user/userSlice";
+import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice";
 import OAuth from "../Components/OAuth.jsx";
 
 export default function SignIn() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(signInStart());
 
     try {
-      dispatch(signInStart());
-
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/api/auth/signin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", // ✅ Important if you’re using cookies/JWT
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/auth/signin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
 
       const data = await res.json();
-      console.log("Signin response:", data);
 
       if (!res.ok) {
-        // Handle 401/400 errors gracefully
-        dispatch(signInFailure(data.message || "Something went wrong"));
+        dispatch(signInFailure(data.message || "Sign in failed"));
         return;
       }
 
@@ -67,30 +48,27 @@ export default function SignIn() {
         <input
           type="email"
           placeholder="Email"
-          className="border p-3 rounded-lg"
           id="email"
           value={formData.email}
           onChange={handleChange}
+          className="border p-3 rounded-lg"
           required
         />
-
         <input
           type="password"
           placeholder="Password"
-          className="border p-3 rounded-lg"
           id="password"
           value={formData.password}
           onChange={handleChange}
+          className="border p-3 rounded-lg"
           required
         />
-
         <button
           disabled={loading}
           className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
         >
           {loading ? "Loading..." : "Sign In"}
         </button>
-
         <OAuth />
       </form>
 
