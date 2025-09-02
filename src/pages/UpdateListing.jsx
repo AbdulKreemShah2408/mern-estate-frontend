@@ -28,6 +28,7 @@ export default function UpdateListing() {
   useEffect(() => {
     const fethListing=async()=>{
        const listingId=params.listingId;
+    if (!listingId) return console.error("Listing ID is missing");
         const res=await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/listing/get/${listingId}`);
         const data=await res.json();
         setFormData(data);
@@ -122,6 +123,7 @@ export default function UpdateListing() {
         method:"PUT",
         headers:{
           "Content-Type":"application/json",
+          "Authorization": `Bearer ${currentUser.token}`,
         },
         body:JSON.stringify({
           ...formData,
