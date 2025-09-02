@@ -1,51 +1,49 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-
+import {useSelector} from "react-redux"
+import {useNavigate} from 'react-router-dom'
 export default function CreateListing() {
-  const { currentUser } = useSelector((state) => state.user);
-  const token = currentUser?.token;
-  const navigate = useNavigate();
-
+  const {currentUser,token} =useSelector(state=>state.user);
+  const navigate=useNavigate();
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     imageUrls: [],
-    name: "",
-    description: "",
-    address: "",
-    type: "rent",
-    bedrooms: 1,
-    bathrooms: 1,
-    regularPrice: 50,
-    discountPrice: 0,
-    offer: false,
-    parking: false,
-    furnished: false,
+    name:'',
+    description:'',
+    address:'',
+    type:'rent',
+    bedrooms:1,
+    bathrooms:1,
+    regularPrice:50,
+    discountPrice:0,
+    offer:false,
+    parking:false,
+    furnished:false,
   });
-
+  console.log(formData);
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const CLOUD_NAME = "dc0yee8iu";
-  const UPLOAD_PRESET = "profile_upload";
-
+  const [error,setError]=useState(false);
+  const [loading,setLoading]=useState(false);
+  const CLOUD_NAME = "dc0yee8iu"; 
+  const UPLOAD_PRESET = "profile_upload"; 
   const handleImageSubmit = async () => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 15) {
       setUploading(true);
       setImageUploadError(false);
       try {
-        const promises = files.map((file) => storeImage(file));
+        const promises = [];
+        for (let i = 0; i < files.length; i++) {
+          promises.push(storeImage(files[i]));
+        }
         const urls = await Promise.all(promises);
-        setFormData((prev) => ({
-          ...prev,
-          imageUrls: prev.imageUrls.concat(urls),
-        }));
+        setFormData({
+          ...formData,
+          imageUrls: formData.imageUrls.concat(urls),
+        });
+        setUploading(false);
       } catch (error) {
         console.error(error);
         setImageUploadError("Image upload failed (max 2MB per image)");
-      } finally {
         setUploading(false);
       }
     } else {
@@ -53,12 +51,10 @@ export default function CreateListing() {
       setUploading(false);
     }
   };
-
   const storeImage = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", UPLOAD_PRESET);
-
     const res = await fetch(
       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
       {
@@ -66,68 +62,73 @@ export default function CreateListing() {
         body: formData,
       }
     );
-
     const data = await res.json();
-    if (data.secure_url) return data.secure_url;
-    throw new Error("Upload failed");
-  };
-
-  const handleRemoveImage = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      imageUrls: prev.imageUrls.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleChange = (e) => {
-    const { id, value, type, checked } = e.target;
-    if (id === "sale" || id === "rent") {
-      setFormData((prev) => ({ ...prev, type: id }));
-    } else if (type === "checkbox") {
-      setFormData((prev) => ({ ...prev, [id]: checked }));
+    if (data.secure_url) {
+      return data.secure_url; 
     } else {
-      setFormData((prev) => ({ ...prev, [id]: value }));
+      throw new Error("Upload failed");
     }
   };
+  const handleRemoveImage = (index) => {
+    setFormData({
+      ...formData,
+      imageUrls: formData.imageUrls.filter((_, i) => i !== index),
+    });
+  };
+  const handleChange = (e) => {
+  const { id, value, type, checked } = e.target;
 
-  const handleSubmit = async (e) => {
+  if (id === 'sale' || id === 'rent') {
+    setFormData({
+      ...formData,
+      type: id,
+    });
+  } else if (type === 'checkbox') {
+    setFormData({
+      ...formData,
+      [id]: checked,
+    });
+  } else {
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
+  }
+};
+
+  const handleSubmit=async(e)=>{
     e.preventDefault();
     try {
-      if (formData.imageUrls.length < 1)
-        return setError("You must upload at least one image");
-      if (+formData.regularPrice < +formData.discountPrice)
-        return setError("Discount price must be lower than regular price");
-
+      if(formData.imageUrls.length<1) return setError("You must upload at lest one image");
+      if(+formData.regularPrice<+formData.discountPrice) return setError("Discount price must be lower than regular price")
       setLoading(true);
       setError(false);
+      const res=await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/api/listing/create`,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization": `Bearer ${token}`,
+          
+        },
+        body:JSON.stringify({
+          ...formData,
 
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/api/listing/create`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      const data = await res.json();
+        }),
+      });
+     const  data= await res.json();
       setLoading(false);
-
-      if (data.success === false) {
+      if(data.success===false){
         setError(data.message);
-        return;
       }
+      if (data && data._id) {
+  navigate(`/listing/${data._id}`);
+}
 
-      if (data && data._id) navigate(`/listing/${data._id}`);
     } catch (error) {
       setError(error.message);
       setLoading(false);
     }
-  };
-
+  }
   return (
     <main className="p-3 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center py-7">
@@ -165,53 +166,23 @@ export default function CreateListing() {
           />
           <div className="flex gap-6 flex-wrap">
             <div className="flex gap-2">
-              <input
-                type="checkbox"
-                id="sale"
-                className="w-5"
-                onChange={handleChange}
-                checked={formData.type === "sale"}
-              />
+              <input type="checkbox" id="sale" className="w-5" onChange={handleChange} checked={formData.type==='sale'} />
               <span>Sell</span>
             </div>
             <div className="flex gap-2">
-              <input
-                type="checkbox"
-                id="rent"
-                className="w-5"
-                onChange={handleChange}
-                checked={formData.type === "rent"}
-              />
+              <input type="checkbox" id="rent" className="w-5" onChange={handleChange} checked={formData.type==='rent'}  />
               <span>Rent</span>
             </div>
             <div className="flex gap-2">
-              <input
-                type="checkbox"
-                id="parking"
-                className="w-5"
-                onChange={handleChange}
-                checked={formData.parking}
-              />
+              <input type="checkbox" id="parking" className="w-5" onChange={handleChange} checked={formData.parking} />
               <span>Parking spot</span>
             </div>
             <div className="flex gap-2">
-              <input
-                type="checkbox"
-                id="furnished"
-                className="w-5"
-                onChange={handleChange}
-                checked={formData.furnished}
-              />
+              <input type="checkbox" id="furnished" className="w-5" onChange={handleChange} checked={formData.furnished} />
               <span>Furnished</span>
             </div>
             <div className="flex gap-2">
-              <input
-                type="checkbox"
-                id="offer"
-                className="w-5"
-                onChange={handleChange}
-                checked={formData.offer}
-              />
+              <input type="checkbox" id="offer" className="w-5"  onChange={handleChange} checked={formData.offer}/>
               <span>Offer</span>
             </div>
           </div>
@@ -247,7 +218,7 @@ export default function CreateListing() {
                 type="number"
                 id="regularPrice"
                 min="50"
-                max="10000000"
+                max='10000000'
                 required
                 className="p-3 border border-gray-300 rounded-lg"
                 onChange={handleChange}
@@ -258,24 +229,23 @@ export default function CreateListing() {
                 <span className="text-xs">($ /month)</span>
               </div>
             </div>
-            {formData.offer && (
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  id="discountPrice"
-                  min="0"
-                  max="10000000"
-                  required
-                  className="p-3 border border-gray-300 rounded-lg"
-                  onChange={handleChange}
-                  value={formData.discountPrice}
-                />
-                <div className="flex flex-col items-center">
-                  <p>Discounted Price</p>
-                  <span className="text-xs">($ /month)</span>
-                </div>
+            {formData.offer && (<div className="flex items-center gap-2">
+              <input
+                type="number"
+                id="discountPrice"
+                min="0"
+                max="10000000"
+                required
+                className="p-3 border border-gray-300 rounded-lg"
+                onChange={handleChange}
+                value={formData.discountPrice}
+              />
+              <div className="flex flex-col items-center">
+                <p>Discounted Price</p>
+                <span className="text-xs">($ /month)</span>
               </div>
-            )}
+            </div>)}
+            
           </div>
         </div>
         <div className="flex flex-col flex-1 gap-4">
@@ -329,11 +299,8 @@ export default function CreateListing() {
               </div>
             ))}
 
-          <button
-            disabled={loading || uploading}
-            className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
-          >
-            {loading ? "Creating..." : "Create listing"}
+          <button disabled={loading || uploading} className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
+          {loading ? 'Creating...' :'Create listing'}
           </button>
           {error && <p className="text-red-700 text-sm">{error}</p>}
         </div>
