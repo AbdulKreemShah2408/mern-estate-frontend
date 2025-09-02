@@ -108,7 +108,6 @@ export default function UpdateListing() {
     });
   };
 
-  // Submit updated listing
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -127,7 +126,7 @@ export default function UpdateListing() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${currentUser.token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ ...formData, userRef: currentUser._id }),
         }
@@ -152,7 +151,7 @@ export default function UpdateListing() {
       </h1>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
         <div className="flex flex-col gap-4 flex-1">
-          {/* Name */}
+         
           <input
             type="text"
             placeholder="Name"
@@ -164,7 +163,7 @@ export default function UpdateListing() {
             onChange={handleChange}
             value={formData.name}
           />
-          {/* Description */}
+         
           <textarea
             placeholder="Description"
             id="description"
@@ -173,7 +172,6 @@ export default function UpdateListing() {
             onChange={handleChange}
             value={formData.description}
           />
-          {/* Address */}
           <input
             type="text"
             placeholder="Address"
@@ -184,7 +182,6 @@ export default function UpdateListing() {
             value={formData.address}
           />
 
-          {/* Checkboxes */}
           <div className="flex gap-6 flex-wrap">
             <label className="flex gap-2 items-center">
               <input
