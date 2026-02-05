@@ -3,9 +3,9 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export default function CreateListing() {
-  const { currentUser } = useSelector((state) => state.user);
-  const token = currentUser?.token;
-  const user = currentUser?.user;
+  // Is tarah likha hona chahiye:
+const { currentUser, token } = useSelector((state) => state.user);
+
 
   const navigate = useNavigate();
 
