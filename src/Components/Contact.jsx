@@ -21,6 +21,7 @@ export default function Contact({ listing }) {
           }
         );
         const data = await res.json();
+        console.log("landlord data:", data);
         setLandlord(data);
       } catch (error) {
         console.log(error);
