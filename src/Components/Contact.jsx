@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function Contact({ listing }) {
   const [landlord, setLandlord] = useState(null);
   const [message, setMessage] = useState("");
+  const { token } = useSelector((state) => state.user);
+
   const onChange = (e) => {
     setMessage(e.target.value);
   };
+
   useEffect(() => {
     const fetchLandlord = async () => {
       try {
@@ -16,10 +20,15 @@ export default function Contact({ listing }) {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
-            credentials: "include",
           }
         );
+        if (!res.ok) {
+          const err = await res.json();
+          console.log("fetchLandlord failed:", res.status, err);
+          return;
+        }
         const data = await res.json();
         console.log("landlord data:", data);
         setLandlord(data);
@@ -28,7 +37,8 @@ export default function Contact({ listing }) {
       }
     };
     fetchLandlord();
-  }, [listing.userRef]);
+  }, [listing.userRef, token]);
+
   return (
     <>
       {landlord && (
@@ -47,7 +57,6 @@ export default function Contact({ listing }) {
             placeholder="Enter your message here..."
             className="w-full border p-3 rounded-lg"
           ></textarea>
-
           <Link
             to={`mailto:${landlord.email}?subject=Regarding ${listing.name}&body=${message}`}
             className="bg-slate-700 text-white text-center p-3 uppercase rounded-lg hover:opacity-95"
